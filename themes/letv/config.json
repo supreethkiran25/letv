@@ -1,0 +1,29 @@
+{
+  "columns": 5,
+  "rows_below_dock": 0,
+  "wallpaper": true,
+  "wallpaper_rotation_minutes": 3,
+  "wallpaper_order": "sequential",
+  "wallpaper_captions": true,
+  "dock_glass": true,
+  "dock_opacity": 70,
+  "launcher_settings_button": true,
+  "open_on_start_choice": true,
+  "reorder_button": true,
+  "icon_only_buttons": true,
+  "icon_only_inputs": true,
+  "library_button": true,
+  "app_library": true,
+  "wifi_status_color": true,
+  "dock_title": true,
+  "ambient_glow": false,
+  "cinematic_art": 0,
+  "app_glow": false,
+  "dock_apps": [
+    "org.smarttube.stable",
+    "in.startv.hotstar",
+    "com.sonyliv",
+    "com.spotify.tv.android",
+    "com.netflix.ninja"
+  ]
+}
