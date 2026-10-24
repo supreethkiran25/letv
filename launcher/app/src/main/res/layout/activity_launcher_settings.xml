@@ -22,11 +22,16 @@
             android:textSize="34sp" />
 
         <TextView
-            android:id="@+id/reorderChoice"
+            android:id="@+id/dockEditChoice"
             style="@style/SettingsRow"
             android:layout_marginTop="28dp"
-            android:text="@string/reorder"
-            android:visibility="gone" />
+            android:text="@string/dock_edit" />
+
+        <TextView
+            android:id="@+id/reorderChoice"
+            style="@style/SettingsRow"
+            android:layout_marginTop="10dp"
+            android:text="@string/reorder" />
 
         <TextView
             android:layout_width="match_parent"

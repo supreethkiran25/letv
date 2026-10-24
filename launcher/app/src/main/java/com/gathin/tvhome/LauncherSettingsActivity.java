@@ -22,6 +22,7 @@ import java.util.List;
 /** Remote-friendly settings owned by the launcher; system settings stay one row away. */
 public final class LauncherSettingsActivity extends Activity {
     static final String EXTRA_REORDER = "com.gathin.tvhome.extra.REORDER_FROM_SETTINGS";
+    static final String EXTRA_DOCK_EDIT = "com.gathin.tvhome.extra.DOCK_EDIT_FROM_SETTINGS";
     private SharedPreferences choices;
     private final TextView[] columnChoices = new TextView[4];
     private final TextView[] rowChoices = new TextView[4];
@@ -44,8 +45,12 @@ public final class LauncherSettingsActivity extends Activity {
         setContentView(R.layout.activity_launcher_settings);
         choices = getSharedPreferences(Config.SETTINGS_NAME, MODE_PRIVATE);
         Config config = Config.load(this);
+        View dockEditChoice = findViewById(R.id.dockEditChoice);
+        dockEditChoice.setOnClickListener(v -> {
+            setResult(RESULT_OK, new Intent().putExtra(EXTRA_DOCK_EDIT, true));
+            finish();
+        });
         View reorderChoice = findViewById(R.id.reorderChoice);
-        reorderChoice.setVisibility(config.launcherSettingsButton ? View.VISIBLE : View.GONE);
         reorderChoice.setOnClickListener(v -> {
             setResult(RESULT_OK, new Intent().putExtra(EXTRA_REORDER, true));
             finish();
@@ -150,8 +155,7 @@ public final class LauncherSettingsActivity extends Activity {
         findViewById(R.id.tvSettingsChoice).setOnClickListener(v ->
                 open(SystemSettings.intent(this, Settings.ACTION_SETTINGS)));
         refresh();
-        if (config.launcherSettingsButton) reorderChoice.requestFocus();
-        else columnChoices[Math.max(0, Math.min(columns - 4, 3))].requestFocus();
+        dockEditChoice.requestFocus();
     }
 
     private void reverseRow(TextView[] views) {

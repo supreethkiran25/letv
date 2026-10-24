@@ -976,21 +976,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == LAUNCHER_SETTINGS_REQUEST && resultCode == RESULT_OK
-                && data != null && data.getBooleanExtra(LauncherSettingsActivity.EXTRA_REORDER, false)) {
-            getIntent().putExtra(LauncherSettingsActivity.EXTRA_REORDER, true);
-            // The old activity must not consume the pending action, or rebuild a second time in onResume.
-            settingsRecreationPending = true;
-            settingsRevision = settingsRevision();
-            recreate();
+        if (requestCode == LAUNCHER_SETTINGS_REQUEST && resultCode == RESULT_OK && data != null) {
+            if (data.getBooleanExtra(LauncherSettingsActivity.EXTRA_DOCK_EDIT, false)) {
+                getIntent().putExtra(LauncherSettingsActivity.EXTRA_DOCK_EDIT, true);
+                settingsRecreationPending = true;
+                settingsRevision = settingsRevision();
+                recreate();
+            } else if (data.getBooleanExtra(LauncherSettingsActivity.EXTRA_REORDER, false)) {
+                getIntent().putExtra(LauncherSettingsActivity.EXTRA_REORDER, true);
+                settingsRecreationPending = true;
+                settingsRevision = settingsRevision();
+                recreate();
+            }
         }
     }
 
     private void startPendingSettingsReorder() {
-        if (settingsRecreationPending || !tilesReady || !hasWindowFocus() || isFinishing()
-                || !getIntent().getBooleanExtra(LauncherSettingsActivity.EXTRA_REORDER, false)) return;
-        getIntent().removeExtra(LauncherSettingsActivity.EXTRA_REORDER);
-        toggleReorder();
+        if (settingsRecreationPending || !tilesReady || !hasWindowFocus() || isFinishing()) return;
+        if (getIntent().getBooleanExtra(LauncherSettingsActivity.EXTRA_DOCK_EDIT, false)) {
+            getIntent().removeExtra(LauncherSettingsActivity.EXTRA_DOCK_EDIT);
+            startDockEdit();
+            return;
+        }
+        if (getIntent().getBooleanExtra(LauncherSettingsActivity.EXTRA_REORDER, false)) {
+            getIntent().removeExtra(LauncherSettingsActivity.EXTRA_REORDER);
+            toggleReorder();
+        }
     }
 
     /** Rebuilds the tiles (and the module cards), then puts focus back where it was. */
