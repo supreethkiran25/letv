@@ -4,6 +4,10 @@ import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.Dialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import java.lang.reflect.Method;
+import java.util.Set;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -174,6 +178,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     /** config show_inputs_pill: false keeps the Inputs pill hidden even when the TV has inputs. */
     private boolean showInputsPill = true;
     private TextView btnWifi;
+    private TextView btnBluetooth;
     /** The network pill's icon as last set, so a refresh that changes nothing does not lay the top bar out again. */
     private int wifiIcon;
     /** The pills have been filled in once; later resumes refresh them after the first frame. */
@@ -483,6 +488,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             });
         }
         btnWifi = findViewById(R.id.btnWifi);
+        btnBluetooth = findViewById(R.id.btnBluetooth);
         shamsiDate = findViewById(R.id.shamsiDate);
         stats = findViewById(R.id.stats);
         raceCalendar = cfg.raceCalendar;
@@ -704,6 +710,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             open(systemIntent(Settings.ACTION_WIFI_SETTINGS));
             return true;
         });
+        if (btnBluetooth != null) {
+            btnBluetooth.setOnClickListener(v -> openBluetooth());
+            updateBluetoothButton();
+        }
         launcherSettingsButton = cfg.launcherSettingsButton;
         if (launcherSettingsButton) {
             ((TextView) btnSettings).setText(R.string.launcher_settings);
@@ -786,12 +796,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         };
         btnInputs.setOnKeyListener(pillKeys);
         btnWifi.setOnKeyListener(pillKeys);
+        if (btnBluetooth != null) btnBluetooth.setOnKeyListener(pillKeys);
         btnSettings.setOnKeyListener(pillKeys);
         btnReorder.setOnKeyListener(pillKeys);
         btnLibraryTop.setOnKeyListener(pillKeys);
         for (View button : topAppButtons) button.setOnKeyListener(pillKeys);
         if (advancedEffects) {
-            List<View> pills = new ArrayList<>(Arrays.asList(btnInputs, btnWifi, btnReorder, btnLibraryTop, btnSettings));
+            List<View> pills = new ArrayList<>(Arrays.asList(btnInputs, btnWifi, btnBluetooth, btnReorder, btnLibraryTop, btnSettings));
             pills.addAll(topAppButtons);
             for (View button : pills) {
                 button.setOnFocusChangeListener((view, focused) -> view.animate()
@@ -963,8 +974,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         // on Home, so after the first resume it runs once that frame is drawn.
         if (pillsShown) {
             refreshPillsAfterNextDraw();
+            updateBluetoothButton();
         } else {
             updateWifiLabel();
+            updateBluetoothButton();
             updateInputsButton();
             pillsShown = true;
         }
@@ -2644,6 +2657,45 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                 btnWifi.setCompoundDrawableTintList(tint);
             }
         }
+    }
+
+    private void openBluetooth() {
+        Intent intent = new Intent("com.google.android.intent.action.CONNECT_INPUT");
+        if (intent.resolveActivity(getPackageManager()) == null) {
+            intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
+        }
+        if (intent.resolveActivity(getPackageManager()) == null) {
+            intent = new Intent(Settings.ACTION_SETTINGS);
+        }
+        open(intent);
+    }
+
+    private void updateBluetoothButton() {
+        if (btnBluetooth == null) return;
+        int battery = 100;
+        try {
+            BluetoothAdapter bta = BluetoothAdapter.getDefaultAdapter();
+            if (bta != null && bta.isEnabled()) {
+                Set<BluetoothDevice> bonded = bta.getBondedDevices();
+                if (bonded != null) {
+                    for (BluetoothDevice d : bonded) {
+                        try {
+                            Method isConnected = d.getClass().getMethod("isConnected");
+                            if (Boolean.TRUE.equals(isConnected.invoke(d))) {
+                                Method getBattery = d.getClass().getMethod("getBatteryLevel");
+                                int lvl = (int) getBattery.invoke(d);
+                                if (lvl >= 0 && lvl <= 100) {
+                                    battery = lvl;
+                                    break;
+                                }
+                            }
+                        } catch (Exception ignored) {}
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+        btnBluetooth.setText(battery + "%");
+        btnBluetooth.setContentDescription(getString(R.string.bluetooth) + " " + battery + "%");
     }
 
     /** config.xml icon_only_buttons. */

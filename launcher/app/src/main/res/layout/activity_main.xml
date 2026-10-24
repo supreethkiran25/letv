@@ -340,6 +340,15 @@
                     android:nextFocusDown="@+id/grid" />
 
                 <TextView
+                    android:id="@+id/btnBluetooth"
+                    style="@style/TopButton"
+                    android:singleLine="true"
+                    android:text="100%"
+                    android:drawableStart="@drawable/ic_bluetooth"
+                    android:contentDescription="@string/bluetooth"
+                    android:nextFocusDown="@+id/grid" />
+
+                <TextView
                     android:id="@+id/btnReorder"
                     style="@style/TopButtonIcon"
                     android:contentDescription="@string/reorder"

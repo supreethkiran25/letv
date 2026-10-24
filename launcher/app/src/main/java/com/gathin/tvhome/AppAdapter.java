@@ -64,7 +64,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     static final class Entry {
-        static final int APP = 0, HOME_SETTINGS = 1, CARD = 2, EMPTY = 3, LIBRARY = 4;
+        static final int APP = 0, HOME_SETTINGS = 1, CARD = 2, EMPTY = 3;
 
         final int kind;
         final String label;
@@ -306,17 +306,12 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 fresh.add(new Entry(label, component, banner, icon));
             }
         }
-        if (showLibrary) {
-            fresh.add(new Entry(Entry.LIBRARY, ctx.getString(R.string.app_library),
-                    new ComponentName(ctx.getPackageName(), "com.gathin.tvhome.apps"), null,
-                    ctx.getDrawable(R.drawable.ic_apps_pill), null, 0));
-        }
         Collections.sort(fresh, (a, b) -> {
             // The owner's own order first; tiles it does not know (new installs) follow by the rule below.
             int saved = Order.compare(savedRanks, a.component.flattenToShortString(), b.component.flattenToShortString());
             if (saved != 0) return saved;
-            int fa = a.kind == Entry.LIBRARY && favourites.indexOf("apps") >= 0 ? favourites.indexOf("apps") : favourites.indexOf(a.pkg);
-            int fb = b.kind == Entry.LIBRARY && favourites.indexOf("apps") >= 0 ? favourites.indexOf("apps") : favourites.indexOf(b.pkg);
+            int fa = favourites.indexOf(a.pkg);
+            int fb = favourites.indexOf(b.pkg);
             if (fa >= 0 || fb >= 0) {
                 if (fa < 0) return 1;
                 if (fb < 0) return -1;
@@ -488,10 +483,6 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
         h.card.setOnClickListener(v -> launch(e));
         h.card.setOnLongClickListener(v -> {
-            if (e.kind == Entry.LIBRARY) {
-                listener.onLibraryRequested();
-                return true;
-            }
             if (tileMenu) {
                 int pos = h.getBindingAdapterPosition();
                 if (pos != RecyclerView.NO_POSITION) listener.onTileLongPress(pos, v);
@@ -509,10 +500,6 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     /** Opens the tile's activity by explicit component, with no extras: a card can name nothing else. */
     private void launch(Entry e) {
-        if (e.kind == Entry.LIBRARY) {
-            listener.onLibraryRequested();
-            return;
-        }
         if (e.kind == Entry.HOME_SETTINGS) {
             ctx.startActivity(new Intent(ctx, HomeSettingsActivity.class)
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
@@ -574,7 +561,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
      * the owner moved into the dock stays there (#499); else a dock_apps entry.
      */
     private boolean isDocked(Entry e) {
-        if (savedDocked < 0) return favourites.contains(e.pkg) || (e.kind == Entry.LIBRARY && favourites.contains("apps"));
+        if (savedDocked < 0) return favourites.contains(e.pkg);
         Integer rank = savedRanks.get(e.component.flattenToShortString());
         return rank != null && rank < savedDocked;
     }
