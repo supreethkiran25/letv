@@ -17,5 +17,10 @@ traces/
 # Generated install bundles and JVM crash reports stay out of contributions.
 *.apk
 *.aab
+# Local configs and signing keys
+config.properties
+*.keystore
+*.idsig
+out/
 launcher/hs_err_pid*.log
 launcher/replay_pid*.log
