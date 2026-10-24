@@ -113,6 +113,10 @@
     </plurals>
     <string name="greeting_with_name">%1$s, %2$s</string>
     <string name="rows_below_dock_label">שורות מתחת לשורת המועדפים</string>
+    <string name="theme_mode_label">מראה</string>
+    <string name="theme_mode_state">מראה: %1$s</string>
+    <string name="theme_mode_dark">כהה</string>
+    <string name="theme_mode_light">בהיר</string>
     <string name="wallpaper_label">טפט</string>
     <string name="wallpaper_state">טפט: %1$s</string>
     <string name="wallpaper_none">ללא</string>

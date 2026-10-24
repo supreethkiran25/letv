@@ -453,6 +453,20 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             ((TextView) findViewById(R.id.date)).setTextColor(Color.WHITE);
             findViewById(R.id.clockDivider).setBackgroundColor(Color.WHITE);
         }
+        SharedPreferences choices = getSharedPreferences(Config.SETTINGS_NAME, Context.MODE_PRIVATE);
+        if ("light".equals(choices.getString("theme_mode", "dark"))) {
+            if (cfg.wallpaper == null) {
+                root.setBackgroundColor(0xFFF0F4F8);
+            }
+            int darkText = 0xFF1E293B;
+            int darkMuted = 0xFF64748B;
+            ((TextView) findViewById(R.id.clock)).setTextColor(darkText);
+            ((TextView) findViewById(R.id.ampm)).setTextColor(darkMuted);
+            ((TextView) findViewById(R.id.date)).setTextColor(darkMuted);
+            greeting.setTextColor(darkMuted);
+            findViewById(R.id.clockDivider).setBackgroundColor(0x33000000);
+            heroName.setTextColor(darkText);
+        }
         if (getResources().getBoolean(R.bool.rtl_menu_bar)) {
             // Center Hebrew greetings over the numeric time, independent of a visible AM/PM label.
             findViewById(R.id.clock).addOnLayoutChangeListener((v, l, t, right, bottom, ol, ot, or, ob) -> {
